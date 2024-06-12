@@ -6,7 +6,7 @@ const { mapDBToModel } = require('../../utils');
 
 class NotesService {
   constructor() {
-    this._pool = new Pool({ ssl: { rejectUnauthorized: false } });
+    this._pool = new Pool();
   }
 
   async addNote({ title, body, tags }) {
