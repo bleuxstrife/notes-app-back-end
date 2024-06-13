@@ -19,10 +19,16 @@ const AuthenticationsService = require('./services/postgres/AuthenticationsServi
 const TokenManager = require('./tokenize/TokenManager');
 const AuthenticationsValidator = require('./validator/authentications');
 
+// collaborations
+const collaborations = require('./api/collaborations');
+const CollaborationsService = require('./services/postgres/CollaborationsService');
+const CollaborationsValidator = require('./validator/collaborations');
+
 const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
-  const notesService = new NotesService();
+  const collaborationsService = new CollaborationsService();
+  const notesService = new NotesService(collaborationsService);
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
   const server = Hapi.server({
@@ -81,6 +87,14 @@ const init = async () => {
         validator: AuthenticationsValidator,
       },
     },
+    {
+      plugin: collaborations,
+      options: {
+        collaborationsService,
+        notesService,
+        validator: CollaborationsValidator,
+      },
+    },
   ]);
   server.ext('onPreResponse', (request, h) => {
     // mendapatkan konteks response dari request
@@ -93,7 +107,9 @@ const init = async () => {
           status: 'fail',
           message: response.message,
         });
-        console.log(`Server Error => ${response.message}`);
+        console.log(`Server Error => Request Path ${request.url}\n 
+          Error Message => ${response.message}\n
+          Error Code => ${response.statusCode}\n`);
         newResponse.code(response.statusCode);
         return newResponse;
       }
@@ -104,7 +120,7 @@ const init = async () => {
         status: 'error',
         message: 'Maaf, terjadi kegagalan pada server kami',
       });
-      console.log(`Server Error => ${response.message}`);
+      console.log(`Server Error => ${request.url}\n Error Message =>${response.message}`);
       newResponse.code(500);
       return newResponse;
     }

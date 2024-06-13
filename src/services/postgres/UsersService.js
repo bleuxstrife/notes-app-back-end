@@ -12,7 +12,7 @@ class UsersService {
 
   async addUser({ username, password, fullname }) {
     await this.verifyNewUsername(username);
-    const id = `user-${nanoid(16)}`;
+    const id = nanoid(16);
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const query = {
@@ -76,6 +76,15 @@ class UsersService {
     }
 
     return id;
+  }
+
+  async getUsersByUsername(username) {
+    const query = {
+      text: 'SELECT id, username, fullname FROM users WHERE username LIKE $1',
+      values: [`%${username}%`],
+    };
+    const result = await this._pool.query(query);
+    return result.rows;
   }
 }
 
