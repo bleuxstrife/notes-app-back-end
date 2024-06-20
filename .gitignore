@@ -2,3 +2,4 @@ node_modules
 note-api-webserver.pem
 .env
 .prod.env
+src/api/uploads/file
