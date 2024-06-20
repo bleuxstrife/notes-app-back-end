@@ -3,3 +3,4 @@ note-api-webserver.pem
 .env
 .prod.env
 src/api/uploads/file
+Bleuxstrife21_accessKeys.csv
