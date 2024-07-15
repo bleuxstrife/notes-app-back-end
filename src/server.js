@@ -1,9 +1,11 @@
 require('dotenv').config();
 
+const os = require('os');
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
 // const path = require('path');
 const Inert = require('@hapi/inert');
+const logger = require('./logger/index');
 
 // notes
 const notes = require('./api/notes');
@@ -160,6 +162,10 @@ const init = async () => {
       newResponse.code(500);
       return newResponse;
     }
+    logger.info(`userIP=${request.info.remoteAddress}, 
+      host=${os.hostname},  method=${request.method}, 
+      path=${request.path},
+      payload=${JSON.stringify(response.source)}`);
     return h.continue;
   });
   await server.start();
